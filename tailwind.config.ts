@@ -6,7 +6,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["var(--font-geist-sans)", ...fontFamily.sans],
+        primary: ["Cinzel", ...fontFamily.sans],
+        second: ["Quicksand", ...fontFamily.sans],
       },
       colors: {
         colors: {

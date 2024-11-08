@@ -26,7 +26,7 @@ const FAKE_DATA = [
 export default async function Home() {
   return (
     <div className="container mx-auto py-12 px-2 flex flex-col gap-4 md:pt-8 md:px-0 md:gap-8">
-      <h1 className="text-5xl text-center font-extrabold md:text-6xl">
+      <h1 className="text-5xl text-center font-primary font-normal md:text-6xl">
         AIsthetics ✨
       </h1>
       <FileInput />

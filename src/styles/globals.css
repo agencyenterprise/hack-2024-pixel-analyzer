@@ -27,3 +27,24 @@
     @apply bg-colors-background text-colors-foreground;
   }
 }
+
+@font-face {
+  font-family: 'Cinzel';
+  src: url('/font/CinzelDecorative-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Cinzel';
+  src: url('/font/CinzelDecorative-Bold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Quicksand';
+  src: url('/font/Quicksand.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}

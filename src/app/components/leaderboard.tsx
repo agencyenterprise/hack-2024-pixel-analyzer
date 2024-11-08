@@ -21,7 +21,7 @@ export function Leaderboard(props: LeaderboardProps) {
 
   return (
     <div className="flex flex-col gap-4">
-      <h2 className="text-center text-3xl font-semibold tracking-wider">
+      <h2 className="text-center text-3xl font-semibold font-second tracking-wider">
         Leaderboard
       </h2>
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
@@ -44,10 +44,10 @@ export function Leaderboard(props: LeaderboardProps) {
             />
 
             <div className="px-4 py-2">
-              <h5 className="mb-2 text-center text-2xl font-bold tracking-tight">
+              <h5 className="mb-2 text-center text-2xl font-bold font-second tracking-tight">
                 {item.score}
               </h5>
-              <p className="mb-3 font-normal text-sm">{item.description}</p>
+              <p className="mb-3 font-normal font-second text-sm">{item.description}</p>
             </div>
           </div>
         ))}

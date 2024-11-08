@@ -79,11 +79,11 @@ export function FileInput() {
       >
         <input {...getInputProps()} />
         {isDragActive ? (
-          <p>Drop a file here...</p>
+          <p className="font-second">Drop a file here...</p>
         ) : (
-          <p>Drag &apos;n&apos; drop a file here, or click to select one</p>
+          <p className="font-second">Drag &apos;n&apos; drop a file here, or click to select one</p>
         )}
-        <span className="text-foreground/80 text-xs">
+        <span className="text-foreground/80 text-xs font-second">
           PNG, JPG or WEBP (Max. 2MB).
         </span>
 
