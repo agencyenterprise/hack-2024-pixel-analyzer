@@ -1,10 +1,6 @@
-interface LeaderboardProps {
-  data: {
-    score: number;
-    description: string;
-    imageUrl: string;
-  }[];
-}
+"use client";
+
+import { api } from "@/trpc/react";
 
 const colorsByIndex: Record<number, string> = {
   0: "bg-gold border-gold",
@@ -12,42 +8,43 @@ const colorsByIndex: Record<number, string> = {
   2: "bg-bronze border-bronze",
 };
 
-export function Leaderboard(props: LeaderboardProps) {
-  const { data } = props;
+export function Leaderboard() {
+  const [data = []] = api.imageScores.getAll.useSuspenseQuery();
 
-  if (data.length === 0) return null;
+  if (data.length === 0) return <div>null</div>;
 
   const orderedData = data.sort((a, b) => b.score - a.score);
 
   return (
     <div className="flex flex-col gap-4">
-      <h2 className="text-center text-3xl font-semibold font-second tracking-wider">
+      <h2 className="font-second text-center text-3xl font-semibold tracking-wider">
         Leaderboard
       </h2>
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
         {orderedData.map((item, index) => (
           <div
             key={index}
-            className="bg-foreground/[2.5%] text-foreground border rounded-lg shadow relative"
+            className="bg-foreground/[2.5%] text-foreground relative rounded-lg border shadow"
           >
             <div
-              className={`text-white shadow-md w-8 h-8 flex items-center justify-center border rounded-full absolute -top-4 -left-4 font-bold
-                ${colorsByIndex[index] ?? "bg-border"}`}
+              className={`absolute -left-4 -top-4 flex h-8 w-8 items-center justify-center rounded-full border font-bold text-white shadow-md ${colorsByIndex[index] ?? "bg-border"}`}
             >
               {index + 1}
             </div>
 
             <img
-              className="rounded-t-lg w-full h-48 object-cover"
-              src={item.imageUrl}
+              className="h-48 w-full rounded-t-lg object-cover"
+              src={item.file_data}
               alt=""
             />
 
             <div className="px-4 py-2">
-              <h5 className="mb-2 text-center text-2xl font-bold font-second tracking-tight">
+              <h5 className="font-second mb-2 text-center text-2xl font-bold tracking-tight">
                 {item.score}
               </h5>
-              <p className="mb-3 font-normal font-second text-sm">{item.description}</p>
+              <p className="font-second mb-3 text-sm font-normal">
+                {item.reason}
+              </p>
             </div>
           </div>
         ))}

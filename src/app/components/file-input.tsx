@@ -5,6 +5,7 @@ import { type FileRejection, useDropzone } from "react-dropzone";
 import toast from "react-hot-toast";
 
 import { UploadButton } from "@/app/components/upload-button";
+import { api } from "@/trpc/react";
 
 const MAX_SIZE_IN_MB = 2;
 
@@ -16,6 +17,22 @@ interface FileWrapper {
 
 export function FileInput() {
   const [fileWrapper, setFileWrapper] = useState<FileWrapper | null>(null);
+  const utils = api.useUtils();
+
+  const createImageScore = api.imageScores.create.useMutation({
+    onSuccess: async () => {
+      await utils.imageScores.invalidate();
+      setFileWrapper(null);
+    },
+  });
+
+  const handleUpload = () => {
+    createImageScore.mutate({
+      file_name: fileWrapper?.file.name ?? "",
+      file_type: fileWrapper?.file.type ?? "",
+      file_data: fileWrapper?.base64 ?? "",
+    });
+  };
 
   const handleSelectFile = (file: File) => {
     const reader = new FileReader();
@@ -79,9 +96,11 @@ export function FileInput() {
         {isDragActive ? (
           <p className="font-second">Drop a file here...</p>
         ) : (
-          <p className="font-second">Drag &apos;n&apos; drop a file here, or click to select one</p>
+          <p className="font-second">
+            Drag &apos;n&apos; drop a file here, or click to select one
+          </p>
         )}
-        <span className="text-foreground/80 text-xs font-second">
+        <span className="text-foreground/80 font-second text-xs">
           PNG, JPG or WEBP (Max. 2MB).
         </span>
 
@@ -98,7 +117,12 @@ export function FileInput() {
         )}
       </div>
 
-      {fileWrapper && <UploadButton />}
+      {fileWrapper && (
+        <UploadButton
+          onClick={handleUpload}
+          isLoading={createImageScore.isPending}
+        />
+      )}
     </div>
   );
 }
