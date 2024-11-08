@@ -5,6 +5,7 @@ import { useState } from "react";
 import { scoresInfo } from "@/types/score-info";
 import { scoreIndex } from "@/utils/scoreIndex";
 import { type ImageScore } from "@prisma/client";
+import { Button } from "@/app/components/button";
 
 const colorsByIndex: Record<number, string> = {
   0: "bg-gold border-gold text-white",
@@ -19,6 +20,7 @@ export function Leaderboard() {
     data: dataParams,
     fetchNextPage,
     isLoading,
+    isFetchingNextPage,
   } = api.imageScores.getAll.useInfiniteQuery(
     {},
     {
@@ -91,9 +93,7 @@ export function Leaderboard() {
                     {item.score} {scoresInfo[scoreIndex(item.score)]?.emoji}
                   </h5>
                   <p className="mb-3 font-second text-sm font-normal">
-                    {canExpanded && !isExpanded
-                      ? truncatedReason
-                      : item.reason}
+                    {canExpanded && !isExpanded ? truncatedReason : item.reason}
                     <span
                       className={`pl-1 text-cyan-600 hover:underline ${canExpanded && "cursor-pointer"}`}
                       onClick={() => canExpanded && handleCardClick(index)}
@@ -107,12 +107,14 @@ export function Leaderboard() {
           })}
 
         {!isLoading && hasMore && (
-          <button
-            className="col-span-full text-center"
-            onClick={() => fetchNextPage()}
-          >
-            Load more
-          </button>
+          <div className="col-span-full mx-auto w-[200px]">
+            <Button
+              isLoading={isFetchingNextPage}
+              loadingLabel="Loading..."
+              onClick={() => fetchNextPage()}
+              label="Load more"
+            />
+          </div>
         )}
 
         {!isLoading && data.length === 0 && (

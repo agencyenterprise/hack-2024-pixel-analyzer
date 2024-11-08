@@ -51,19 +51,27 @@ export function FileInput() {
     }
   }, [jobId]);
 
-  const getJob = api.imageScores.getJob.useMutation({
-    onSuccess: async (data) => {
+  const onGetJobSuccess = useCallback(
+    async (data: { job?: { returnvalue?: ImageScore } }) => {
+      if (!jobId) return;
+
       if (data.job?.returnvalue) {
-        await utils.imageScores.getAll.invalidate();
-
-        setLoading(false);
-        setCreatedImageScore(data.job?.returnvalue as ImageScore);
-
+        setJobId(null);
         if (interval.current) {
           clearInterval(interval.current);
         }
+
+        setLoading(false);
+        setCreatedImageScore(data.job?.returnvalue);
+
+        await utils.imageScores.getAll.invalidate();
       }
     },
+    [jobId],
+  );
+
+  const getJob = api.imageScores.getJob.useMutation({
+    onSuccess: onGetJobSuccess,
   });
 
   const createImageScore = api.imageScores.create.useMutation({

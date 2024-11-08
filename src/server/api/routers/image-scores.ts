@@ -52,7 +52,7 @@ export const imageScoresRouter = createTRPCRouter({
         data,
         limit,
         offset,
-        hasMore: count ? offset + limit < count : false,
+        hasMore: count ? offset + limit + 1 < count : false,
         total: count ?? 0,
       };
     }),
