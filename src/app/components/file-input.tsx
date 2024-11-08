@@ -112,7 +112,7 @@ export function FileInput() {
     <div className="mb-32 flex flex-col items-center justify-center gap-2 md:mb-0 md:min-h-[50vh]">
       <div
         {...getRootProps()}
-        className="hover:bg-foreground/[2.5%] w-4/5 cursor-pointer rounded-md border border-dashed p-4 text-center text-xl font-semibold"
+        className="hover:bg-foreground/[2.5%] w-4/5 cursor-pointer rounded-md border border-dashed border-border p-4 text-center text-xl font-semibold"
       >
         <input {...getInputProps()} />
         {isDragActive ? (

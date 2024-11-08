@@ -38,7 +38,7 @@ export function Leaderboard() {
           Array.from({ length: 4 }).map((_, index) => (
             <div
               key={index}
-              className="flex w-full animate-pulse flex-col overflow-hidden rounded-lg border bg-foreground/[2.5%] shadow"
+              className="flex w-full animate-pulse flex-col overflow-hidden rounded-lg border border-border bg-foreground/[2.5%] shadow"
             >
               <div className="h-48 w-full bg-foreground/20" />
               <div className="flex flex-col gap-2 px-4 py-2 pb-5">
@@ -55,16 +55,16 @@ export function Leaderboard() {
           data.map((item, index) => (
             <div
               key={index}
-              className="relative rounded-lg border bg-foreground/[2.5%] text-foreground shadow"
+              className="relative rounded-lg border border-border bg-foreground/[2.5%] text-foreground shadow"
             >
               <div
-                className={`absolute -left-4 -top-4 flex h-8 w-8 items-center justify-center rounded-full border font-bold text-white shadow-md ${colorsByIndex[index] ?? "bg-border"}`}
+                className={`absolute -left-4 -top-4 flex h-8 w-8 items-center justify-center rounded-full border border-border font-bold text-white shadow-md ${colorsByIndex[index] ?? "bg-gray-400 dark:bg-gray-800"}`}
               >
                 {index + 1}
               </div>
 
               <img
-                className="h-48 w-full rounded-t-lg object-cover"
+                className="h-48 w-full rounded-t-lg object-cover border-b border-border"
                 src={item.file_data}
                 alt=""
               />
