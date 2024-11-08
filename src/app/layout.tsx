@@ -3,7 +3,7 @@ import "@/styles/globals.css";
 import { GeistSans } from "geist/font/sans";
 import { type Metadata } from "next";
 
-// import { ThemeProvider } from "next-themes";
+import { ThemeProvider } from "next-themes";
 import { Toaster } from "react-hot-toast";
 import { TRPCReactProvider } from "@/trpc/react";
 
@@ -18,12 +18,18 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${GeistSans.variable}`}>
+    <html
+      lang="en"
+      className={`${GeistSans.variable}`}
+      suppressHydrationWarning
+    >
       <body>
         <TRPCReactProvider>
-          <Toaster position="top-right" />
+          <ThemeProvider enableSystem attribute="class">
+            <Toaster position="top-right" />
 
-          {children}
+            {children}
+          </ThemeProvider>
         </TRPCReactProvider>
       </body>
     </html>

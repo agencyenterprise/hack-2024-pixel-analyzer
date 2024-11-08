@@ -2,13 +2,13 @@
 
 import { MoonIcon, SunIcon } from "@heroicons/react/24/solid";
 
-// import { useTheme } from "next-themes";
+import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 
-const ThemeSwitcher = () => {
+export function ThemeSwitcher() {
   const [mounted, setMounted] = useState(false);
-  // const { theme, setTheme } = useTheme();
-  const [theme, setTheme] = useState("");
+  // eslint-disable-next-line
+  const { theme, setTheme } = useTheme();
 
   useEffect(() => {
     setMounted(true);
@@ -26,10 +26,9 @@ const ThemeSwitcher = () => {
       onClick={() => {
         const newTheme = theme === "light" ? "dark" : "light";
 
+        // eslint-disable-next-line
         setTheme(newTheme);
       }}
     />
   );
-};
-
-export default ThemeSwitcher;
+}

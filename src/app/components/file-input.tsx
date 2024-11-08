@@ -17,8 +17,6 @@ interface FileWrapper {
 export function FileInput() {
   const [fileWrapper, setFileWrapper] = useState<FileWrapper | null>(null);
 
-  console.log(fileWrapper);
-
   const handleSelectFile = (file: File) => {
     const reader = new FileReader();
 

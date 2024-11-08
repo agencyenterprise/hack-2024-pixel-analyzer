@@ -3,27 +3,25 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 4%;
+  :root.light {
+    --background: 255 255 255;
+    --foreground: 10 10 10;
 
-    --border: 0 0% 90%;
+    --border: 230 230 230;
+
+    --gold: 249 217 118;
+    --silver: 224 224 224;
+    --bronze: 205 127 50;
   }
 
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --background: 0 0% 4%;
-      --foreground: 0 0% 98%;
-      
-      --border: 0 0% 15%;
-    }
-  }
+  :root.dark {
+    --background: 10 10 10;
+    --foreground: 250 250 250;
 
-  * {
-    @apply border-colors-border;
-  }
+    --border: 38 38 38;
 
-  body {
-    @apply bg-colors-background text-colors-foreground;
+    --gold: 184 134 11;
+    --silver: 160 160 160;
+    --bronze: 140 98 57;
   }
 }
