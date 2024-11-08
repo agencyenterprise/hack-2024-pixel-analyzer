@@ -1,23 +1,29 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { type FileRejection, useDropzone } from "react-dropzone";
 import toast from "react-hot-toast";
 
 import { UploadButton } from "@/app/components/upload-button";
 import { api } from "@/trpc/react";
-import { UploadModal } from "./uploadModal";
+import { UploadModal } from "@/app/components/upload-modal";
 import { scoresInfo } from "@/types/score-info";
 import { scoreIndex } from "@/utils/scoreIndex";
+import { type ImageScore } from "@prisma/client";
 
 const MAX_SIZE_IN_MB = 2;
 
 const loadingMessages: string[] = [
-  "Just a sec, the AI is working its wizardry...",
+  "Just a sec, the AI is working its wizardry... 🪄✨",
   "AI's thinking... be right back with your score! 🤔⚡",
   "Fetching your score... hold on, the AI is on it! 🤖💡",
   "Hang tight... AI magic in progress! 🪄💻",
-  "AI’s busy doing its thing... please wait! ⚙️🤖",
+  "AI's busy doing its thing... please wait! ⚙️🤖",
+  "Almost done... AI's putting on the finishing touches! 🎨✨",
+  "Processing your score... AI's working its magic! 🌟🔮",
+  "AI's analyzing your image... won't be long now! 📊🤖",
+  "The AI is deep in thought... results coming soon! 🧠💫",
+  "Just a moment more... AI's finalizing your score! 🎯✨",
 ];
 
 interface FileWrapper {
@@ -26,35 +32,48 @@ interface FileWrapper {
   base64: string;
 }
 
-interface ImageInfo {
-  file_name: string,
-  file_type: string,
-  file_data: string,
-  score: number,
-  reason: string,
-  user_name: string | null,
-}
-
 export function FileInput() {
   const [fileWrapper, setFileWrapper] = useState<FileWrapper | null>(null);
   const [loading, setLoading] = useState(false);
-  const [openModal, setOpenModal] = useState(false);
-  const [succeedUploadImage, setSucceedUploadImage] = useState<ImageInfo | null>(null);
+  const [createdImageScore, setCreatedImageScore] = useState<ImageScore | null>(
+    null,
+  );
   const [loadingMessage, setLoadingMessage] = useState(loadingMessages[0]);
+  const [jobId, setJobId] = useState<string | null>(null);
   const utils = api.useUtils();
+  const interval = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    if (jobId) {
+      interval.current = setInterval(() => {
+        getJob.mutate({ jobId });
+      }, 5000);
+    }
+  }, [jobId]);
+
+  const getJob = api.imageScores.getJob.useMutation({
+    onSuccess: async (data) => {
+      if (data.job?.returnvalue) {
+        await utils.imageScores.getAll.invalidate();
+
+        setLoading(false);
+        setCreatedImageScore(data.job?.returnvalue as ImageScore);
+
+        if (interval.current) {
+          clearInterval(interval.current);
+        }
+      }
+    },
+  });
 
   const createImageScore = api.imageScores.create.useMutation({
     onSuccess: async (data) => {
-      setLoading(true);
-      setSucceedUploadImage(data);
-      setOpenModal(true);
-      setLoading(false);
-      await utils.imageScores.invalidate();
-      setFileWrapper(null);
+      setJobId(data.jobId ?? null);
     },
   });
 
   const handleUpload = () => {
+    setLoading(true);
     createImageScore.mutate({
       file_name: fileWrapper?.file.name ?? "",
       file_type: fileWrapper?.file.type ?? "",
@@ -116,17 +135,18 @@ export function FileInput() {
 
   useEffect(() => {
     if (loading) {
-      let index = 0;
       const interval = setInterval(() => {
-        setLoadingMessage(loadingMessages[index] ?? "loading...");
-        index = (index + 1) % loadingMessages.length;
-      }, 8000);
+        const randomIndex = Math.floor(Math.random() * loadingMessages.length);
+
+        setLoadingMessage(loadingMessages[randomIndex] ?? "loading...");
+      }, 4000);
+
       return () => clearInterval(interval);
     }
   }, [loading]);
 
   return (
-    <div className="mb-32 flex flex-col items-center justify-center gap-2 md:mb-0 md:min-h-[50vh]">
+    <div className="mb-32 flex flex-col items-center justify-center gap-2 md:mb-0 md:min-h-[30vh]">
       <div
         {...getRootProps()}
         className="w-4/5 cursor-pointer rounded-md border border-dashed border-border p-4 text-center text-xl font-semibold hover:bg-foreground/[2.5%]"
@@ -149,32 +169,34 @@ export function FileInput() {
             height={192}
             src={fileWrapper.url}
             className="mx-auto mt-4 object-cover"
-            // onLoad={() => {
-            //   URL.revokeObjectURL(fileWrapper.url);
-            // }}
           />
         )}
       </div>
 
       {fileWrapper && (
-        <UploadButton
-          onClick={handleUpload}
-          //isLoading={createImageScore.isPending}
-          isLoading={loading}
-        />
+        <UploadButton onClick={handleUpload} isLoading={loading} />
       )}
       {loading && loadingMessage && (
         <p className="font-second text-sm text-foreground">{loadingMessage}</p>
       )}
 
-      {openModal && (
+      {createdImageScore && (
         <UploadModal
-          image={fileWrapper?.url ?? ""}
-          score={succeedUploadImage?.score ?? 0}
-          emoji={scoresInfo[scoreIndex(succeedUploadImage?.score ?? 0)]?.emoji ?? ""}
-          scoreDescription={scoresInfo[scoreIndex(succeedUploadImage?.score ?? 0)]?.description ?? ""}
-          imageDescription={succeedUploadImage?.reason ?? ""}
-          onClose={() => setOpenModal(false)}
+          imageScore={createdImageScore}
+          emoji={
+            scoresInfo[scoreIndex(createdImageScore?.score ?? 0)]?.emoji ?? ""
+          }
+          scoreDescription={
+            scoresInfo[scoreIndex(createdImageScore?.score ?? 0)]
+              ?.description ?? ""
+          }
+          onClose={() => {
+            if (fileWrapper) {
+              URL.revokeObjectURL(fileWrapper.url);
+            }
+            setCreatedImageScore(null);
+            setFileWrapper(null);
+          }}
         />
       )}
     </div>

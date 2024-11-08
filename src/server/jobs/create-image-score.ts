@@ -22,12 +22,9 @@ export const imageScoreQueue = new Queue(queueName, {
   connection: redisConnection,
 });
 
-const imageScoreWorker = new Worker(
+new Worker(
   queueName,
   async (job) => {
-    console.log("------job-----");
-    return;
-
     const { input } = job.data as QueueInterface;
 
     const anthropic = new Anthropic({
@@ -73,7 +70,7 @@ const imageScoreWorker = new Worker(
       reason: string;
     };
 
-    return db.imageScore.create({
+    const createdImageScore = await db.imageScore.create({
       data: {
         file_name: input.file_name,
         file_type: input.file_type,
@@ -83,21 +80,18 @@ const imageScoreWorker = new Worker(
         user_name: "",
       },
     });
+
+    return createdImageScore;
   },
   {
     connection: redisConnection,
   },
 );
 
-imageScoreWorker.on("completed", (job) => {
-  console.log("done with jobb -------", job.id);
-
-  // const jobData = await imageScoreQueue.getJob(job.id);
-  // console.log("jobData", jobData);
-
-  // return;
-});
-
 export const addToCreateImageScoreQueue = (data: QueueInterface) => {
   return imageScoreQueue.add(queueName, data);
+};
+
+export const getJobById = (jobId: string) => {
+  return imageScoreQueue.getJob(jobId);
 };

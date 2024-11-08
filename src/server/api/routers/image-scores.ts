@@ -1,7 +1,10 @@
 import { z } from "zod";
 
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
-import { addToCreateImageScoreQueue } from "@/server/jobs/create-image-score";
+import {
+  addToCreateImageScoreQueue,
+  getJobById,
+} from "@/server/jobs/create-image-score";
 
 const createSchema = z.object({
   file_name: z.string().min(1),
@@ -9,11 +12,21 @@ const createSchema = z.object({
   file_data: z.string().min(1),
 });
 
+const getJobSchema = z.object({
+  jobId: z.string().min(1),
+});
+
 export const imageScoresRouter = createTRPCRouter({
   create: publicProcedure.input(createSchema).mutation(async ({ input }) => {
-    await addToCreateImageScoreQueue({ input });
+    const { id } = await addToCreateImageScoreQueue({ input });
 
-    return { success: true };
+    return { success: true, jobId: id };
+  }),
+
+  getJob: publicProcedure.input(getJobSchema).mutation(async ({ input }) => {
+    const job = await getJobById(input.jobId);
+
+    return { success: true, job };
   }),
 
   getAll: publicProcedure.query(async ({ ctx }) => {
