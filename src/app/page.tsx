@@ -9,7 +9,7 @@ export default async function Home() {
         AIsthetics ✨
       </h1>
       <FileInput />
-      {/* <Leaderboard /> */}
+      <Leaderboard />
       <ThemeSwitcher />
     </div>
   );
