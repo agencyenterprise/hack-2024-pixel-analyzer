@@ -22,11 +22,9 @@ const scoreDescriptions = [
 ];
 
 export function Leaderboard() {
-  const [data = []] = api.imageScores.getAll.useSuspenseQuery();
+  const { data = [] } = api.imageScores.getAll.useQuery();
 
-  if (data.length === 0) return <div>null</div>;
-
-  const orderedData = data.sort((a, b) => b.score - a.score);
+  if (data.length === 0) return null;
 
   const scoreIndex = (score: number): number => {
     return Math.floor(score / 10);
@@ -38,7 +36,7 @@ export function Leaderboard() {
         Leaderboard
       </h2>
       <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
-        {orderedData.map((item, index) => (
+        {data.map((item, index) => (
           <div
             key={index}
             className="bg-foreground/[2.5%] dark:bg-foreground/10 text-foreground relative rounded-lg border border-border shadow"
