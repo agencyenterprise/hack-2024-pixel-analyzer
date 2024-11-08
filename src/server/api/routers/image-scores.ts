@@ -29,11 +29,31 @@ export const imageScoresRouter = createTRPCRouter({
     return { success: true, job };
   }),
 
-  getAll: publicProcedure.query(async ({ ctx }) => {
-    const imageScores = await ctx.db.imageScore.findMany({
-      orderBy: { score: "desc" },
-    });
+  getAll: publicProcedure
+    .input(
+      z.object({
+        limit: z.number().min(1).max(100).nullish(),
+        cursor: z.number().nullish(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const limit = input.limit ?? 7;
+      const offset = input.cursor ?? 0;
 
-    return imageScores;
-  }),
+      const count = await ctx.db.imageScore.count();
+
+      const data = await ctx.db.imageScore.findMany({
+        take: limit + 1,
+        skip: offset,
+        orderBy: { score: "desc" },
+      });
+
+      return {
+        data,
+        limit,
+        offset,
+        hasMore: count ? offset + limit < count : false,
+        total: count ?? 0,
+      };
+    }),
 });

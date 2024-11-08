@@ -4,6 +4,7 @@ import { api } from "@/trpc/react";
 import { useState } from "react";
 import { scoresInfo } from "@/types/score-info";
 import { scoreIndex } from "@/utils/scoreIndex";
+import { type ImageScore } from "@prisma/client";
 
 const colorsByIndex: Record<number, string> = {
   0: "bg-gold border-gold text-white",
@@ -12,12 +13,29 @@ const colorsByIndex: Record<number, string> = {
 };
 
 export function Leaderboard() {
-  const { data = [], isLoading } = api.imageScores.getAll.useQuery();
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
+
+  const {
+    data: dataParams,
+    fetchNextPage,
+    isLoading,
+  } = api.imageScores.getAll.useInfiniteQuery(
+    {},
+    {
+      getNextPageParam: (lastPage) => lastPage.offset + lastPage.limit + 1,
+    },
+  );
 
   const handleCardClick = (index: number) => {
     setExpandedIndex(expandedIndex === index ? null : index);
   };
+
+  const data =
+    dataParams?.pages.flatMap((page) => page.data) ?? ([] as ImageScore[]);
+  const hasMore =
+    (dataParams?.pages ?? [])?.length > 0
+      ? (dataParams?.pages?.[dataParams.pages.length - 1]?.hasMore ?? false)
+      : false;
 
   return (
     <div className="flex flex-col gap-4 p-5">
@@ -87,6 +105,15 @@ export function Leaderboard() {
               </div>
             );
           })}
+
+        {!isLoading && hasMore && (
+          <button
+            className="col-span-full text-center"
+            onClick={() => fetchNextPage()}
+          >
+            Load more
+          </button>
+        )}
 
         {!isLoading && data.length === 0 && (
           <div className="col-span-full text-center">No data =/</div>
