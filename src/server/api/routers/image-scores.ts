@@ -2,11 +2,7 @@ import { z } from "zod";
 import Anthropic from "@anthropic-ai/sdk";
 
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
-import { type ImageScore } from "@/types/image-scores";
 import { type MessageParam } from "@anthropic-ai/sdk/resources/messages.mjs";
-
-// Mocked DB
-const imageScores: ImageScore[] = [];
 
 export const imageScoresRouter = createTRPCRouter({
   create: publicProcedure
@@ -17,7 +13,7 @@ export const imageScoresRouter = createTRPCRouter({
         file_data: z.string().min(1),
       }),
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ ctx, input }) => {
       const anthropic = new Anthropic({
         apiKey: process.env.ANTHROPIC_API_KEY ?? "",
       });
@@ -64,22 +60,23 @@ export const imageScoresRouter = createTRPCRouter({
         reason: string;
       };
 
-      const imageScore: ImageScore = {
-        id: String(imageScores.length + 1),
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        file_name: input.file_name,
-        file_type: input.file_type,
-        file_data: input.file_data,
-        score: parsedMessage.score,
-        reason: parsedMessage.reason,
-        user_name: "",
-      };
-      imageScores.push(imageScore);
-      return imageScore;
+      return ctx.db.imageScore.create({
+        data: {
+          file_name: input.file_name,
+          file_type: input.file_type,
+          file_data: input.file_data,
+          score: parsedMessage.score,
+          reason: parsedMessage.reason,
+          user_name: "",
+        },
+      });
     }),
 
-  getAll: publicProcedure.query(() => {
-    return imageScores.sort((a, b) => b.score - a.score) ?? [];
+  getAll: publicProcedure.query(async ({ ctx }) => {
+    const imageScores = await ctx.db.imageScore.findMany({
+      orderBy: { score: "desc" },
+    });
+
+    return imageScores;
   }),
 });
