@@ -2,6 +2,8 @@
 
 import { api } from "@/trpc/react";
 import { useState } from "react";
+import { scoresInfo } from "@/types/score-info";
+import { scoreIndex } from "@/utils/scoreIndex";
 
 const colorsByIndex: Record<number, string> = {
   0: "bg-gold border-gold text-white",
@@ -9,26 +11,9 @@ const colorsByIndex: Record<number, string> = {
   2: "bg-bronze border-bronze text-white",
 };
 
-const scoreIcons: Record<number, string> = {
-  0: "💀",
-  1: "😬",
-  2: "🫠",
-  3: "😐",
-  4: "🤔",
-  5: "🙂",
-  6: "😊",
-  7: "😎",
-  8: "🤯",
-  9: "🤩",
-};
-
 export function Leaderboard() {
   const { data = [], isLoading } = api.imageScores.getAll.useQuery();
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
-
-  const scoreIndex = (score: number): number => {
-    return Math.floor(score / 10);
-  };
 
   const handleCardClick = (index: number) => {
     setExpandedIndex(expandedIndex === index ? null : index);
@@ -69,7 +54,7 @@ export function Leaderboard() {
             return (
               <div
                 key={index}
-                className={`relative rounded-lg border border-border bg-foreground/[2.5%] text-foreground shadow ${isExpanded ? "h-full" : "h-[35vh]"} ${canExpanded && 'cursor-pointer'} `}
+                className={`relative rounded-lg border border-border bg-foreground/[2.5%] text-foreground shadow ${isExpanded ? "h-full" : "h-[35vh]"} ${canExpanded && "cursor-pointer"} `}
                 onClick={() => canExpanded && handleCardClick(index)}
               >
                 <div
@@ -79,23 +64,24 @@ export function Leaderboard() {
                 </div>
 
                 <img
-                  className="h-48 w-full rounded-t-lg object-cover border-b border-border"
+                  className="h-48 w-full rounded-t-lg border-b border-border object-cover"
                   src={item.file_data}
                   alt=""
                 />
 
                 <div className="px-4 py-2">
                   <h5 className="mb-2 text-center font-second text-2xl font-bold tracking-tight">
-                    {item.score}{" "}
-                    {scoreIcons[scoreIndex(item.score)]}
+                    {item.score} {scoresInfo[scoreIndex(item.score)]?.emoji}
                   </h5>
                   <p className="mb-3 font-second text-sm font-normal">
-                    {(canExpanded && !isExpanded) ? (
+                    {canExpanded && !isExpanded ? (
                       <>
                         {truncatedReason}
-                        <span className="hover:underline pl-1">read more</span>
+                        <span className="pl-1 hover:underline">read more</span>
                       </>
-                    ) : item.reason}
+                    ) : (
+                      item.reason
+                    )}
                   </p>
                 </div>
               </div>

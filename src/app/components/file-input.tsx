@@ -6,6 +6,9 @@ import toast from "react-hot-toast";
 
 import { UploadButton } from "@/app/components/upload-button";
 import { api } from "@/trpc/react";
+import { UploadModal } from "./uploadModal";
+import { scoresInfo } from "@/types/score-info";
+import { scoreIndex } from "@/utils/scoreIndex";
 
 const MAX_SIZE_IN_MB = 2;
 
@@ -23,17 +26,31 @@ interface FileWrapper {
   base64: string;
 }
 
+interface ImageInfo {
+  file_name: string,
+  file_type: string,
+  file_data: string,
+  score: number,
+  reason: string,
+  user_name: string | null,
+}
+
 export function FileInput() {
   const [fileWrapper, setFileWrapper] = useState<FileWrapper | null>(null);
   const [loading, setLoading] = useState(false);
+  const [openModal, setOpenModal] = useState(false);
+  const [succeedUploadImage, setSucceedUploadImage] = useState<ImageInfo | null>(null);
   const [loadingMessage, setLoadingMessage] = useState(loadingMessages[0]);
   const utils = api.useUtils();
 
   const createImageScore = api.imageScores.create.useMutation({
-    onSuccess: async () => {
-      setLoading(true)
-      // await utils.imageScores.invalidate();
-      // setFileWrapper(null);
+    onSuccess: async (data) => {
+      setLoading(true);
+      setSucceedUploadImage(data);
+      setOpenModal(true);
+      setLoading(false);
+      await utils.imageScores.invalidate();
+      setFileWrapper(null);
     },
   });
 
@@ -101,7 +118,7 @@ export function FileInput() {
     if (loading) {
       let index = 0;
       const interval = setInterval(() => {
-        setLoadingMessage(loadingMessages[index] ?? 'loading...');
+        setLoadingMessage(loadingMessages[index] ?? "loading...");
         index = (index + 1) % loadingMessages.length;
       }, 8000);
       return () => clearInterval(interval);
@@ -112,7 +129,7 @@ export function FileInput() {
     <div className="mb-32 flex flex-col items-center justify-center gap-2 md:mb-0 md:min-h-[50vh]">
       <div
         {...getRootProps()}
-        className="hover:bg-foreground/[2.5%] w-4/5 cursor-pointer rounded-md border border-dashed border-border p-4 text-center text-xl font-semibold"
+        className="w-4/5 cursor-pointer rounded-md border border-dashed border-border p-4 text-center text-xl font-semibold hover:bg-foreground/[2.5%]"
       >
         <input {...getInputProps()} />
         {isDragActive ? (
@@ -122,7 +139,7 @@ export function FileInput() {
             Drag &apos;n&apos; drop a file here, or click to select one
           </p>
         )}
-        <span className="text-foreground/80 font-second text-xs">
+        <span className="font-second text-xs text-foreground/80">
           PNG, JPG or WEBP (Max. 2MB).
         </span>
 
@@ -132,9 +149,9 @@ export function FileInput() {
             height={192}
             src={fileWrapper.url}
             className="mx-auto mt-4 object-cover"
-            onLoad={() => {
-              URL.revokeObjectURL(fileWrapper.url);
-            }}
+            // onLoad={() => {
+            //   URL.revokeObjectURL(fileWrapper.url);
+            // }}
           />
         )}
       </div>
@@ -142,12 +159,24 @@ export function FileInput() {
       {fileWrapper && (
         <UploadButton
           onClick={handleUpload}
-          // isLoading={createImageScore.isPending}
+          //isLoading={createImageScore.isPending}
           isLoading={loading}
         />
       )}
-      {loading && loadingMessage && <p className="text-foreground font-second text-sm">{loadingMessage}</p>}
+      {loading && loadingMessage && (
+        <p className="font-second text-sm text-foreground">{loadingMessage}</p>
+      )}
 
+      {openModal && (
+        <UploadModal
+          image={fileWrapper?.url ?? ""}
+          score={succeedUploadImage?.score ?? 0}
+          emoji={scoresInfo[scoreIndex(succeedUploadImage?.score ?? 0)]?.emoji ?? ""}
+          scoreDescription={scoresInfo[scoreIndex(succeedUploadImage?.score ?? 0)]?.description ?? ""}
+          imageDescription={succeedUploadImage?.reason ?? ""}
+          onClose={() => setOpenModal(false)}
+        />
+      )}
     </div>
   );
 }
