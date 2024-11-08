@@ -1,6 +1,7 @@
 "use client";
 
 import { api } from "@/trpc/react";
+import { useState } from "react";
 
 const colorsByIndex: Record<number, string> = {
   0: "bg-gold border-gold text-white",
@@ -8,24 +9,29 @@ const colorsByIndex: Record<number, string> = {
   2: "bg-bronze border-bronze text-white",
 };
 
-const scoreDescriptions = [
-  { emoji: "💀", description: "Is this... even a photo?" },
-  { emoji: "😬", description: "Oof, there's potential, but it's buried!" },
-  { emoji: "🫠", description: "Well… you did try, right?" },
-  { emoji: "😐", description: "Not bad, but could use some work!" },
-  { emoji: "🤔", description: "Interesting... still deciding what to think!" },
-  { emoji: "🙂", description: "Alright, we’re getting somewhere!" },
-  { emoji: "😊", description: "Nice! This is pretty solid." },
-  { emoji: "😎", description: "Cool stuff! Almost pro-level!" },
-  { emoji: "🤯", description: "Wow! That’s a masterpiece in the making!" },
-  { emoji: "🤩", description: "Absolutely epic! You nailed it!" },
-];
+const scoreIcons: Record<number, string> = {
+  0: "💀",
+  1: "😬",
+  2: "🫠",
+  3: "😐",
+  4: "🤔",
+  5: "🙂",
+  6: "😊",
+  7: "😎",
+  8: "🤯",
+  9: "🤩",
+};
 
 export function Leaderboard() {
   const { data = [], isLoading } = api.imageScores.getAll.useQuery();
+  const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
 
   const scoreIndex = (score: number): number => {
     return Math.floor(score / 10);
+  };
+
+  const handleCardClick = (index: number) => {
+    setExpandedIndex(expandedIndex === index ? null : index);
   };
 
   return (
@@ -52,34 +58,49 @@ export function Leaderboard() {
           ))}
 
         {!isLoading &&
-          data.map((item, index) => (
-            <div
-              key={index}
-              className="relative rounded-lg border bg-foreground/[2.5%] text-foreground shadow"
-            >
+          data.map((item, index) => {
+            const canExpanded = item.reason.length > 80;
+            const isExpanded = expandedIndex === index;
+            const truncatedReason =
+              item.reason.length > 80
+                ? item.reason.substring(0, 50) + "..."
+                : item.reason;
+
+            return (
               <div
-                className={`absolute -left-4 -top-4 flex h-8 w-8 items-center justify-center rounded-full border font-bold text-white shadow-md ${colorsByIndex[index] ?? "bg-border"}`}
+                key={index}
+                className={`relative rounded-lg border bg-foreground/[2.5%] text-foreground shadow ${isExpanded ? "h-full" : "h-[35vh]"} ${canExpanded && 'cursor-pointer'} `}
+                onClick={() => canExpanded && handleCardClick(index)}
               >
-                {index + 1}
-              </div>
+                <div
+                  className={`absolute -left-4 -top-4 flex h-8 w-8 items-center justify-center rounded-full border font-bold text-white shadow-md ${colorsByIndex[index] ?? "bg-border"}`}
+                >
+                  {index + 1}
+                </div>
 
-              <img
-                className="h-48 w-full rounded-t-lg object-cover"
-                src={item.file_data}
-                alt=""
-              />
+                <img
+                  className="h-48 w-full rounded-t-lg object-cover"
+                  src={item.file_data}
+                  alt=""
+                />
 
-              <div className="px-4 py-2">
-                <h5 className="mb-2 text-center font-second text-2xl font-bold tracking-tight">
-                  {item.score}{" "}
-                  {scoreDescriptions[scoreIndex(item.score || 0)]?.emoji}
-                </h5>
-                <p className="mb-3 font-second text-sm font-normal">
-                  {item.reason}
-                </p>
+                <div className="px-4 py-2">
+                  <h5 className="mb-2 text-center font-second text-2xl font-bold tracking-tight">
+                    {item.score}{" "}
+                    {scoreIcons[scoreIndex(item.score)]}
+                  </h5>
+                  <p className="mb-3 font-second text-sm font-normal">
+                    {(canExpanded && !isExpanded) ? (
+                      <>
+                        {truncatedReason}
+                        <span className="hover:underline pl-1">read more</span>
+                      </>
+                    ) : item.reason}
+                  </p>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
 
         {!isLoading && data.length === 0 && (
           <div className="col-span-full text-center">No data =/</div>
