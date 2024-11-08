@@ -11,7 +11,7 @@ const colorsByIndex: Record<number, string> = {
 export function Leaderboard() {
   const { data = [] } = api.imageScores.getAll.useQuery();
 
-  if (data.length === 0) return <div>null</div>;
+  if (data.length === 0) return null;
 
   return (
     <div className="flex flex-col gap-4">
