@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 4%;
+
+    --border: 0 0% 90%;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --background: 0 0% 4%;
+      --foreground: 0 0% 98%;
+      
+      --border: 0 0% 15%;
+    }
+  }
+
+  * {
+    @apply border-colors-border;
+  }
+
+  body {
+    @apply bg-colors-background text-colors-foreground;
+  }
+}
