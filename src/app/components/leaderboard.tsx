@@ -7,9 +7,9 @@ interface LeaderboardProps {
 }
 
 const colorsByIndex: Record<number, string> = {
-  0: "bg-gold border-gold-dark",
-  1: "bg-silver border-silver-dark",
-  2: "bg-bronze border-bronze-dark",
+  0: "bg-gold border-gold",
+  1: "bg-silver border-silver",
+  2: "bg-bronze border-bronze",
 };
 
 export function Leaderboard(props: LeaderboardProps) {
