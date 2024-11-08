@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { type FileRejection, useDropzone } from "react-dropzone";
 import toast from "react-hot-toast";
 
@@ -8,6 +8,14 @@ import { UploadButton } from "@/app/components/upload-button";
 import { api } from "@/trpc/react";
 
 const MAX_SIZE_IN_MB = 2;
+
+const loadingMessages: string[] = [
+  "Just a sec, the AI is working its wizardry...",
+  "AI's thinking... be right back with your score! 🤔⚡",
+  "Fetching your score... hold on, the AI is on it! 🤖💡",
+  "Hang tight... AI magic in progress! 🪄💻",
+  "AI’s busy doing its thing... please wait! ⚙️🤖",
+];
 
 interface FileWrapper {
   file: File;
@@ -17,12 +25,15 @@ interface FileWrapper {
 
 export function FileInput() {
   const [fileWrapper, setFileWrapper] = useState<FileWrapper | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState(loadingMessages[0]);
   const utils = api.useUtils();
 
   const createImageScore = api.imageScores.create.useMutation({
     onSuccess: async () => {
-      await utils.imageScores.invalidate();
-      setFileWrapper(null);
+      setLoading(true)
+      // await utils.imageScores.invalidate();
+      // setFileWrapper(null);
     },
   });
 
@@ -86,11 +97,22 @@ export function FileInput() {
     maxSize: MAX_SIZE_IN_MB * 1024 * 1024,
   });
 
+  useEffect(() => {
+    if (loading) {
+      let index = 0;
+      const interval = setInterval(() => {
+        setLoadingMessage(loadingMessages[index] ?? 'loading...');
+        index = (index + 1) % loadingMessages.length;
+      }, 8000);
+      return () => clearInterval(interval);
+    }
+  }, [loading]);
+
   return (
     <div className="mb-32 flex flex-col items-center justify-center gap-2 md:mb-0 md:min-h-[50vh]">
       <div
         {...getRootProps()}
-        className="hover:bg-foreground/[2.5%] cursor-pointer rounded-md border border-dashed p-4 text-center text-xl font-semibold"
+        className="hover:bg-foreground/[2.5%] w-4/5 cursor-pointer rounded-md border border-dashed p-4 text-center text-xl font-semibold"
       >
         <input {...getInputProps()} />
         {isDragActive ? (
@@ -120,9 +142,12 @@ export function FileInput() {
       {fileWrapper && (
         <UploadButton
           onClick={handleUpload}
-          isLoading={createImageScore.isPending}
+          // isLoading={createImageScore.isPending}
+          isLoading={loading}
         />
       )}
+      {loading && loadingMessage && <p className="text-foreground font-second text-sm">{loadingMessage}</p>}
+
     </div>
   );
 }
