@@ -31,7 +31,7 @@ export default async function Home() {
       </h1>
       <FileInput />
       <Leaderboard data={FAKE_DATA} />
-      <ThemeSwitcher />
+      <ThemeSwitcher /> 
     </div>
   );
 }
