@@ -1,4 +1,5 @@
 import { type ImageScore } from "@prisma/client";
+import { Button } from "@/app/components/button";
 
 interface UploadModalProps {
   imageScore: ImageScore;
@@ -22,16 +23,16 @@ export function UploadModal({
         >
           ✕
         </button>
-        <div className="flex flex-col items-center justify-around gap-10 md:flex-row">
+        <div className="flex flex-col items-center justify-around gap-10 lg:flex-row">
           <img
             src={imageScore.file_data}
             className="h-[30vh] w-[80%] object-cover lg:h-[40vh] lg:w-[40%]"
           />
           <div className="flex w-full flex-col items-center gap-3 text-center lg:w-1/2">
-            <div className="font-second text-4xl font-bold">
+            <div className="font-second text-6xl font-bold">
               {imageScore.score} {emoji}
             </div>
-            <p className="font-second text-base font-bold text-foreground">
+            <p className="font-second text-xl font-extrabold text-foreground">
               {scoreDescription}
             </p>
             <p className="font-second text-base text-foreground">
@@ -39,12 +40,13 @@ export function UploadModal({
             </p>
           </div>
         </div>
-        <button
-          className="mt-4 w-1/2 rounded-md border border-border p-2 font-second text-base font-bold text-foreground hover:bg-foreground hover:text-background lg:w-1/3"
-          onClick={onClose}
-        >
-          Ok
-        </button>
+        <div className="mt-4 w-1/2 lg:w-1/3 items-center">
+          <Button
+            onClick={onClose}
+            label="Ok"
+            isLoading={false}
+          />
+        </div>
       </div>
     </div>
   );

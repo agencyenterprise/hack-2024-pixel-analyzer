@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { type FileRejection, useDropzone } from "react-dropzone";
 import toast from "react-hot-toast";
 
-import { UploadButton } from "@/app/components/upload-button";
+import { Button } from "@/app/components/button";
 import { api } from "@/trpc/react";
 import { UploadModal } from "@/app/components/upload-modal";
 import { scoresInfo } from "@/types/score-info";
@@ -174,7 +174,14 @@ export function FileInput() {
       </div>
 
       {fileWrapper && (
-        <UploadButton onClick={handleUpload} isLoading={loading} />
+        <div className="w-1/2 sm:w-1/3 lg:w-1/5">
+          <Button
+            onClick={handleUpload}
+            isLoading={loading}
+            label="Upload"
+            loadingLabel="Uploading..."
+          />
+        </div>
       )}
       {loading && loadingMessage && (
         <p className="font-second text-sm text-foreground">{loadingMessage}</p>

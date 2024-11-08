@@ -20,11 +20,11 @@ export function Leaderboard() {
   };
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 p-5">
       <h2 className="pb-5 text-center font-second text-3xl font-semibold tracking-wider">
         Leaderboard
       </h2>
-      <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
+      <div className="grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-4">
         {isLoading &&
           Array.from({ length: 4 }).map((_, index) => (
             <div
@@ -44,18 +44,17 @@ export function Leaderboard() {
 
         {!isLoading &&
           data.map((item, index) => {
-            const canExpanded = item.reason.length > 80;
+            const canExpanded = item.reason.length > 110;
             const isExpanded = expandedIndex === index;
             const truncatedReason =
-              item.reason.length > 80
-                ? item.reason.substring(0, 50) + "..."
+              item.reason.length > 105
+                ? item.reason.substring(0, 105) + "..."
                 : item.reason;
 
             return (
               <div
                 key={index}
-                className={`relative rounded-lg border border-border bg-foreground/[2.5%] text-foreground shadow ${isExpanded ? "h-full" : "h-[35vh]"} ${canExpanded && "cursor-pointer"} `}
-                onClick={() => canExpanded && handleCardClick(index)}
+                className={`relative rounded-lg border border-border bg-foreground/[2.5%] text-foreground shadow ${isExpanded ? "h-full" : "h-fit"} `}
               >
                 <div
                   className={`absolute -left-4 -top-4 flex h-8 w-8 items-center justify-center rounded-full border border-border font-bold text-white shadow-md ${colorsByIndex[index] ?? "bg-gray-400 dark:bg-gray-800"}`}
@@ -74,14 +73,15 @@ export function Leaderboard() {
                     {item.score} {scoresInfo[scoreIndex(item.score)]?.emoji}
                   </h5>
                   <p className="mb-3 font-second text-sm font-normal">
-                    {canExpanded && !isExpanded ? (
-                      <>
-                        {truncatedReason}
-                        <span className="pl-1 hover:underline">read more</span>
-                      </>
-                    ) : (
-                      item.reason
-                    )}
+                    {canExpanded && !isExpanded
+                      ? truncatedReason
+                      : item.reason}
+                    <span
+                      className={`pl-1 text-cyan-600 hover:underline ${canExpanded && "cursor-pointer"}`}
+                      onClick={() => canExpanded && handleCardClick(index)}
+                    >
+                      {isExpanded ? "read less" : "read more"}
+                    </span>
                   </p>
                 </div>
               </div>
