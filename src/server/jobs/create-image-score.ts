@@ -58,6 +58,7 @@ new Worker(
       system: `
         You are an objective image evaluator.
         Analyze the image and assign a random score between 1-100, without any specific criteria or bias.
+        You need to be very strict and harsh with the score.
         Respond only with a valid JSON object in this exact format: {"score": number, "reason": string}.
         The reason should be a brief and detailed explanation (2 sentences) that specifically describes which aspects influenced the score, highlighting both strengths and areas for improvement.
         `,
