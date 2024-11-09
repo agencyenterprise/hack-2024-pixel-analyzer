@@ -40,11 +40,11 @@ export function Leaderboard() {
       : false;
 
   return (
-    <div className="flex flex-col gap-4 p-5">
+    <div className="flex flex-col p-3 md:gap-4 md:p-5">
       <h2 className="pb-5 text-center font-second text-3xl font-semibold tracking-wider">
         Leaderboard
       </h2>
-      <div className="grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 md:gap-6 md:grid-cols-3 lg:grid-cols-4">
         {isLoading &&
           Array.from({ length: 4 }).map((_, index) => (
             <div
