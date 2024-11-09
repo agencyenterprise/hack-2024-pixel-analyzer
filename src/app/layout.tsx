@@ -1,6 +1,7 @@
 import "@/styles/globals.css";
 
 import { type Metadata } from "next";
+import Script from 'next/script'
 
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "react-hot-toast";
@@ -30,6 +31,7 @@ export default function RootLayout({
           </ThemeProvider>
         </TRPCReactProvider>
       </body>
+      <Script src="https://scripts.simpleanalyticscdn.com/latest.js" />
     </html>
   );
 }
