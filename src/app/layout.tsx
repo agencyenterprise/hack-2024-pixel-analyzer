@@ -7,9 +7,9 @@ import { Toaster } from "react-hot-toast";
 import { TRPCReactProvider } from "@/trpc/react";
 
 export const metadata: Metadata = {
-  title: "AIsthetics",
+  title: "Pixel Analyzer",
   description:
-    "AIsthetics is a tool to help you understand the aesthetics of AI.",
+    "Pixel Analyzer is a tool to help you understand the aesthetics of AI.",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 
